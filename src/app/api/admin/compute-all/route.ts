@@ -3,6 +3,11 @@ import { prisma } from '@/lib/prisma';
 import { calculateWASHIndex, RawWashParameters, WaterSourceType, SanitationFacilityType, HygieneFacilityType } from '@/lib/engine';
 import { aggregateIndexScores } from '@/lib/aggregation';
 
+// Force this route to be fully dynamic — never statically analyzed at build time.
+// This prevents "Failed to collect page data" errors on Vercel.
+export const dynamic = 'force-dynamic';
+export const runtime = 'nodejs';
+
 // Load GeoJSON at runtime. On Vercel, public/ isn't on the serverless
 // filesystem, so we fetch from the app's own public URL first, then
 // fall back to fs for local development.
