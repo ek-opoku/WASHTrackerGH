@@ -27,19 +27,15 @@ export function aggregateIndexScores(
     for (const entity of entities) {
         const pop = entity.population;
 
-        // Only aggregate if the data was actually collected (not exactly 0 due to Missing Data Exclusions)
-        if (entity.scores.water > 0) {
-            sumWater += entity.scores.water * pop;
-            totalPopWater += pop;
-        }
-        if (entity.scores.sanitation > 0) {
-            sumSan += entity.scores.sanitation * pop;
-            totalPopSan += pop;
-        }
-        if (entity.scores.hygiene > 0) {
-            sumHyg += entity.scores.hygiene * pop;
-            totalPopHyg += pop;
-        }
+        // Ensure 0 scores (like Open Defecation) are correctly aggregated and drag down the regional average.
+        sumWater += entity.scores.water * pop;
+        totalPopWater += pop;
+
+        sumSan += entity.scores.sanitation * pop;
+        totalPopSan += pop;
+
+        sumHyg += entity.scores.hygiene * pop;
+        totalPopHyg += pop;
     }
 
     const finalWater = totalPopWater > 0 ? sumWater / totalPopWater : 0;
@@ -47,10 +43,11 @@ export function aggregateIndexScores(
     const finalHyg = totalPopHyg > 0 ? sumHyg / totalPopHyg : 0;
 
     // Composite: Weighted formula (0.35 Water, 0.35 Sanitation, 0.3 Hygiene)
-    const weights: [number, number][] = [];
-    if (finalWater > 0) weights.push([finalWater, 0.35]);
-    if (finalSan > 0) weights.push([finalSan, 0.35]);
-    if (finalHyg > 0) weights.push([finalHyg, 0.30]);
+    const weights: [number, number][] = [
+        [finalWater, 0.35],
+        [finalSan, 0.35],
+        [finalHyg, 0.30]
+    ];
 
     let finalComposite = 0;
     if (weights.length > 0) {
