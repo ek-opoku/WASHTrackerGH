@@ -8,23 +8,22 @@ import { aggregateIndexScores } from '@/lib/aggregation';
 export const dynamic = 'force-dynamic';
 export const runtime = 'nodejs';
 
-// Load GeoJSON at runtime. On Vercel, public/ isn't on the serverless
-// filesystem, so we fetch from the app's own public URL first, then
-// fall back to fs for local development.
-async function loadGeoJSON(filename: string, baseUrl?: string) {
-    // Try fetch first (works on Vercel and locally when dev server is running)
-    if (baseUrl) {
-        try {
-            const res = await fetch(`${baseUrl}/data/${filename}`);
-            if (res.ok) return await res.json();
-        } catch { /* fall through to fs */ }
-    }
+// Fetch GeoJSON directly from the production URL.
+// Vercel Serverless Functions cannot read the /public directory using fs.
+async function loadGeoJSON(filename: string) {
+    // Hardcode the absolute production URL to guarantee it works on Vercel
+    const productionUrl = 'https://wash-tracker-gh-jhhm.vercel.app';
 
-    // Fallback: read from filesystem (local dev / environments with public/ on disk)
-    const fs = (await import('fs')).default;
-    const path = (await import('path')).default;
-    const filePath = path.join(process.cwd(), 'public/data', filename);
-    return JSON.parse(fs.readFileSync(filePath, 'utf8'));
+    // In local development, we can still fetch from localhost if the dev server is running
+    const baseUrl = process.env.NODE_ENV === 'development'
+        ? 'http://localhost:3000'
+        : productionUrl;
+
+    const res = await fetch(`${baseUrl}/data/${filename}`);
+    if (!res.ok) {
+        throw new Error(`Failed to fetch ${filename} from ${baseUrl}`);
+    }
+    return await res.json();
 }
 
 function mapWaterSource(val: string | null): WaterSourceType | null {
@@ -75,13 +74,6 @@ function parseBoolean(val: any): boolean | null {
 export async function POST(request: Request) {
     try {
         // Derive the app's base URL for fetching public assets
-        let baseUrl = new URL(request.url).origin;
-        if (process.env.VERCEL_PROJECT_PRODUCTION_URL) {
-            baseUrl = `https://${process.env.VERCEL_PROJECT_PRODUCTION_URL}`;
-        } else if (process.env.VERCEL_URL) {
-            baseUrl = `https://${process.env.VERCEL_URL}`;
-        }
-
         await prisma.computedIndex.deleteMany({});
         const rawData = await prisma.rawDomesticData.findMany();
         const rawMap = new Map();
@@ -89,8 +81,8 @@ export async function POST(request: Request) {
             rawMap.set(r.spatial_id, r);
         }
 
-        const regionsRaw = await loadGeoJSON('gha_regions.geojson', baseUrl);
-        const districtsRaw = await loadGeoJSON('gha_districts.geojson', baseUrl);
+        const regionsRaw = await loadGeoJSON('gha_regions.geojson');
+        const districtsRaw = await loadGeoJSON('gha_districts.geojson');
 
         const regionProps = regionsRaw.features.map((f: any) => f.attributes || f.properties);
         const districtProps = districtsRaw.features.map((f: any) => f.attributes || f.properties);
