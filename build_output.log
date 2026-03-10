@@ -1,0 +1,94 @@
+﻿
+> washtrackergh@0.1.0 build
+> next build
+
+  Γû▓ Next.js 14.2.18
+
+   Creating an optimized production build ...
+node.exe : Failed to 
+compile.
+At line:1 char:1
++ & "C:\Program 
+Files\nodejs/node.exe" 
+"C:\Program 
+Files\nodejs/node_mo 
+...
++ ~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~~~
+~~
+    + CategoryInfo     
+         : NotSpecifi  
+  ed: (Failed to com   
+ pile.:String) [],     
+RemoteException
+    + FullyQualifiedEr 
+   rorId : NativeComm  
+  andError
+ 
+
+./src/components/Rankin
+gs.tsx
+Error: 
+  [31mx[0m Expected 
+unicode escape
+   ,-[[36;1;4mD:\Proje
+cts\WASH Tracker App\WA
+SHTrackerGH\src\compone
+nts\Rankings.tsx[0m:1:
+1]
+ [2m1[0m | \"use 
+client\";
+   : [31;1m^[0m
+ [2m2[0m | 
+ [2m3[0m | import { 
+useMemo } from 
+\"react\";
+ [2m4[0m | import 
+type { Region } from 
+\"@/lib/mockData\";
+   `----
+
+Caused by:
+    Syntax Error
+
+Import trace for 
+requested module:
+./src/components/Rankin
+gs.tsx
+./src/components/MapCon
+tainer.tsx
+
+./src/components/Summar
+yCards.tsx
+Error: 
+  [31mx[0m Expected 
+unicode escape
+   ,-[[36;1;4mD:\Proje
+cts\WASH Tracker App\WA
+SHTrackerGH\src\compone
+nts\SummaryCards.tsx[0
+m:1:1]
+ [2m1[0m | \"use 
+client\";
+   : [31;1m^[0m
+ [2m2[0m | 
+ [2m3[0m | import 
+type { District, 
+Region } from 
+\"@/lib/mockData\";
+   `----
+
+Caused by:
+    Syntax Error
+
+Import trace for 
+requested module:
+./src/components/Summar
+yCards.tsx
+./src/components/MapCon
+tainer.tsx
+
+
+> Build failed because 
+of webpack errors

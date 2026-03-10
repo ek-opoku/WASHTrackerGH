@@ -1,0 +1,260 @@
+Ablekuma Central Municipal
+Ablekuma North Municipal
+Ablekuma West Municipal
+Abuakwa North
+Abuakwa South
+Abura-Asebu-Kwamankese
+Accra Metropolis
+Achiase
+Ada East
+Ada West
+Adaklu
+Adansi Akrofuom
+Adansi Asokwa
+Adansi North
+Adansi South
+Adenta Municipal
+Afadzato South
+Afigya Kwabre North
+Afigya Kwabre South
+Agona East
+Agona West Municipal
+Agotime Ziope
+Ahafo Ano North
+Ahafo Ano South East
+Ahafo Ano South West
+Ahanta West Municipal
+Ajumako-Enyan-Essiam
+Akatsi North
+Akatsi South
+Akwapem North
+Akwapem South
+Akyem Mansa
+Amansie Central
+Amansie South
+Amansie West
+Anloga
+Aowin
+Asante Akim Central Municipal
+Asante Akim North
+Asante Akim South
+Asene Akroso Manso
+Ashaiman Municipal
+Asikuma-Odoben-Brakwa
+Asokore Mampong Municipal
+Asokwa Municipal
+Assin Fosu
+Assin North
+Assin South
+Asunafo North Municipal
+Asunafo South
+Asuogyaman
+Asutifi North
+Asutifi South
+Atebubu Amantin
+Atiwa East
+Atiwa West
+Atwima Kwanwoma
+Atwima Mponua
+Atwima Nwabiagya North
+Atwima Nwabiagya South
+Awutu Senya
+Awutu Senya East
+Ayawaso Central Municipal
+Ayawaso East Municipal
+Ayawaso North Municipal
+Ayawaso West
+Ayensuano
+Banda
+Bawku Municipal
+Bawku West
+Bekwai Municipal
+Berekum East Municipal
+Berekum West
+Bia East
+Bia West
+Biakoye
+Bibiani-Anhwiaso-Bekwai Municipal
+Binduri
+Birim Central Municipal
+Birim North
+Birim South
+Bodi
+Bole
+Bolga East
+Bolgatanga Municipal
+Bongo
+Bosome Freho
+Bosomtwe
+Builsa North
+Builsa South
+Bunkpurugu Nakpanduri
+Cape Coast Metropolitan
+Central Gonja
+Central Tongu
+Chereponi
+Daffiama Bussie Issa
+Denkyembour
+Dormaa East
+Dormaa Municipal
+Dormaa West
+East Gonja Municipal
+East Mamprusi
+Effia Kwesimintsim Municipal
+Effutu Municipal
+Ejisu Municipal
+Ejura-Sekyedumase
+Ekumfi
+Ellembelle
+Fanteakwa North
+Fanteakwa South
+Ga Central Municipal
+Ga East
+Ga North Municipal
+Ga South Municipal
+Ga West Municipal
+Garu
+Gomoa Central
+Gomoa East
+Gomoa West
+Gushegu
+Ho Municipal
+Ho West
+Hohoe Municipal
+Jaman North
+Jaman South Municipal
+Jasikan
+Jirapa
+Jomoro
+Juaben Municipal
+Juaboso
+Kadjebi
+Karaga
+Kasena Nankana East
+Kasena Nankana West
+Keta Municipal
+Ketu North
+Ketu South
+Kintampo North Municipal
+Kintampo South
+Komenda-Edina-Eguafo-Abirem Municipal
+Korle Klottey Municipal
+Kpandai
+Kpando Municipal
+Kpone Katamanso
+Krachi East Municipal
+Krachi Nchumuru
+Krachi West
+Krowor Municipal
+Kumasi Metropolitan
+Kumbungu
+Kwabre East
+Kwadaso Municipal
+Kwaebibirem
+Kwahu Afram Plains North
+Kwahu Afram Plains South
+Kwahu East
+Kwahu South
+Kwahu West
+La Dade-Kotopon
+La-Nkwantanang-Madina
+Lambussie-Karni
+Lawra
+Ledzokuku Municipal
+Lower Manya
+Mampong Municipal
+Mamprugu Moagduri
+Mfantseman Municipal
+Mion
+Mpohor
+Nabdam
+Nadowli-Kaleo
+Nandom
+Nanton
+Nanumba North
+Nanumba South
+New Juaben North Municipal
+New Juaben South Municipal
+Ningo/Prampram
+Nkoranza North
+Nkoranza South
+Nkwanta North
+Nkwanta South Municipal
+North Dayi
+North East Gonja
+North Gonja
+North Tongu
+Nsawam Adoagyiri
+Nzema East
+Obuasi East
+Obuasi Municipal
+Offinso Municipal
+Offinso North
+Oforikrom Municipal
+Okaikwei North Municipal
+Okere
+Old Tafo Municipal
+Prestea/Huni Valley
+Pru East
+Pru West
+Pusiga
+Saboba
+Sagnerigu
+Savelugu
+Sawla-Tuna-Kalba
+Sefwi Akontombra
+Sefwi-Wiawso
+Sekondi Takoradi Metropolis
+Sekyere Afram Plains North
+Sekyere Central
+Sekyere East
+Sekyere Kumawu
+Sekyere South
+Sene East
+Sene West
+Shai Osudoku
+Shama
+Sissala East
+Sissala West
+South Dayi
+South Tongu
+Suaman
+Suame Municipal
+Suhum Municipal
+Sunyani Municipal
+Sunyani West
+Tain
+Talensi
+Tamale Metropolitan
+Tano North Municipal
+Tano South Municipal
+Tarkwa Nsuaem
+Tatale Sanguli
+Techiman Municipal
+Techiman North
+Tema Metropolitan
+Tema West Municipal
+Tempane
+Tolon
+Twifo Atti-Morkwa
+Twifo Hemang Lower Denkyira
+Upper Denkyira East Municipal
+Upper Denkyira West
+Upper Manya
+Upper West Akim
+Wa East
+Wa Municipal
+Wa West
+Wassa Amenfi Central
+Wassa Amenfi East
+Wassa Amenfi West
+Wassa East
+Weija Gbawe Municipal
+Wenchi Municipal
+West Akim
+West Gonja
+West Mamprusi Municipal
+Yendi Municipal
+Yilo Krobo
+Yunyoo-Nasuan
+Zabzugu

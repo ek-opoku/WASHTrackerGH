@@ -1,0 +1,74 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model RawDomesticData {
+  id                          String    @id @default(uuid())
+  spatial_id                  String    @unique
+  domain_tag                  String?
+  timestamp                   DateTime?
+  source_reliability          Int?
+  urban_rural                 String?
+  income_level                String?
+  gender_hh_head              String?
+  age_hh_head                 Int?
+  disability_present          Boolean?
+  migratory_status            String?
+
+  water_source_type           String?
+  water_secondary_source_type String?
+  water_on_premises           Boolean?
+  water_availability_hours    Float?
+  water_collection_time_mins  Float?
+  water_ecoli_cfu             Float?
+  water_arsenic_mg            Float?
+  water_fluoride_mg           Float?
+  water_mercury_mg            Float?
+  water_other_heavy_metals_mg Float?
+  water_ph                    Float?
+
+  san_facility_type           String?
+  san_shared                  String?
+  fsm_contained_safely        Boolean?
+  fsm_emptied_safely          Boolean?
+  fsm_treated_at_plant        Boolean?
+
+  hyg_facility_type           String?
+  hyg_water_present           String?
+  hyg_soap_present            String?
+
+  mhm_privacy                 String?
+  mhm_materials               String?
+  mhm_participation_exclusion String?
+
+  @@map("raw_domestic_data")
+}
+
+model ComputedIndex {
+  id              String   @id @default(uuid())
+  spatialId       String   @unique
+  level           String
+  name            String
+  parentId        String?
+  population      Int      @default(0)
+
+  waterScore      Float
+  sanitationScore Float
+  hygieneScore    Float
+  compositeScore  Float
+  isCapped        Boolean  @default(false)
+
+  // JSON fields to store the aggregated ladder metrics for the UI
+  waterData       Json?
+  sanitationData  Json?
+  hygieneData     Json?
+
+  updatedAt       DateTime @updatedAt
+
+  @@map("computed_index")
+}

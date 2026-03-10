@@ -1,0 +1,6 @@
+spatial_id,domain_tag,timestamp,source_reliability,urban_rural,income_level,gender_hh_head,age_hh_head,disability_present,migratory_status,water_source_type,water_secondary_source_type,water_on_premises,water_availability_hours,water_collection_time_mins,water_ecoli_cfu,water_arsenic_mg,water_fluoride_mg,water_mercury_mg,water_other_heavy_metals_mg,water_ph,san_facility_type,san_shared,fsm_contained_safely,fsm_emptied_safely,fsm_treated_at_plant,hyg_facility_type,hyg_water_present,hyg_soap_present,mhm_privacy,mhm_materials,mhm_participation_exclusion
+Kumasi_Metropolitan,domestic,2026-03-08T00:00:00Z,3,Urban,Middle,Male,45,No,Resident,Piped into dwelling,,Yes,24,0,0,0,0,0,0,7.2,Piped sewer system,No,Yes,Yes,Yes,Fixed sink,Yes,Yes,Yes,Yes,No
+Western_Ahanta_West_Municipal,domestic,2026-03-08T00:00:00Z,3,Rural,Low,Female,52,Yes,Resident,Borehole,,No,18,25,10,0.05,0,0,0,6.8,Pit latrine without slab,Yes,No,No,No,Mobile device,Yes,No,No,No,Yes
+,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,
+,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,
+,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,

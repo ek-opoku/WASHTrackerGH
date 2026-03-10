@@ -1,0 +1,301 @@
+{
+  "Ghana 2024 National and Regional Hygiene Data Aggregates.xlsx": {
+    "Table 1": [
+      [
+        "Country",
+        "Residence_Type",
+        "Service_level",
+        "Coverage_Percentage",
+        "Population"
+      ],
+      [
+        "Ghana",
+        "total",
+        "Basic service",
+        "45.48408% 1, 48% 2",
+        "15658992.27594 1, Not in source 2"
+      ],
+      [
+        "Ghana",
+        "total",
+        "Limited service",
+        "44.85552% 1, 35% 2",
+        "15442596.51096 1, Not in source 2"
+      ]
+    ],
+    "Source References": [
+      [
+        "Index",
+        "Reference"
+      ],
+      [
+        "1",
+        "washdash-download.csv"
+      ],
+      [
+        "2",
+        "Ghana Sanitation Profile_2020_Final.pdf"
+      ]
+    ]
+  },
+  "Ghana National SDG 6.3 - 6.b Macro Performance Indicators.xlsx": {
+    "Table 1": [
+      [
+        "Indicator_Name",
+        "Year_2021_Actual",
+        "Year_2022_Actual",
+        "Year_2023_Target"
+      ],
+      [
+        "Proportion of bodies of water with good ambient water quality",
+        "56.6%",
+        "58.2%",
+        "Not in source"
+      ],
+      [
+        "Proportion of liquid waste safely disposed",
+        "13.3%",
+        "13.3%",
+        "Not in source"
+      ]
+    ],
+    "Source References": [
+      [
+        "Index",
+        "Reference"
+      ],
+      [
+        "1",
+        "2023-PBB-MWRS.pdf"
+      ],
+      [
+        "2",
+        "Ministry_of_Sanitation_and_Water_Resources_APR_2019.pdf"
+      ]
+    ]
+  },
+  "Household Water and Sanitation Service Counts by District.xlsx": {
+    "Table 1": [
+      [
+        "Region",
+        "District",
+        "Total_Households",
+        "Basic_Sanitation_Households",
+        "Without_Basic_Sanitation_Households",
+        "Basic_Water_Households",
+        "Without_Basic_Water_Households"
+      ],
+      [
+        "Western",
+        "Ahanta West Municipal",
+        "47288",
+        "8296",
+        "38992",
+        "43861",
+        "3427"
+      ],
+      [
+        "Western",
+        "Effia Kwesimintsim Municipal",
+        "53717",
+        "20859",
+        "32858",
+        "53543",
+        "174"
+      ]
+    ],
+    "Source References": [
+      [
+        "Index",
+        "Reference"
+      ],
+      [
+        "1",
+        "Household Drinking Water and Sanitation.pdf"
+      ]
+    ]
+  },
+  "Main Drinking Water Source and Collection Time by Region.xlsx": {
+    "Table 1": [
+      [
+        "Region",
+        "Total_Households",
+        "Pipe_borne_inside_dwelling",
+        "Pipe_borne_outside_compound",
+        "Public_tap_Standpipe",
+        "Borehole_Tube_well",
+        "Protected_well",
+        "Rain_water",
+        "Protected_spring",
+        "Bottled_water",
+        "Sachet_water",
+        "Tanker_supplied",
+        "Unprotected_well",
+        "Unprotected_spring",
+        "Surface_water",
+        "Water_on_premises",
+        "Within_30_minutes",
+        "31_to_60_minutes",
+        "61_minutes_and_above"
+      ],
+      [
+        "Greater Accra",
+        "1,698,374",
+        "136,052",
+        "84,956",
+        "64,779",
+        "17,051",
+        "5,158",
+        "1,482",
+        "110",
+        "63,978",
+        "1,200,752",
+        "22,272",
+        "649",
+        "82",
+        "4,924",
+        "1,510,264",
+        "174,901",
+        "8,455",
+        "4,754"
+      ],
+      [
+        "Ashanti",
+        "1,521,844",
+        "144,722",
+        "74,298",
+        "233,363",
+        "258,701",
+        "43,641",
+        "1,637",
+        "835",
+        "26,675",
+        "573,947",
+        "2,273",
+        "4,401",
+        "621",
+        "47,373",
+        "837,751",
+        "645,642",
+        "33,663",
+        "4,788"
+      ]
+    ],
+    "Source References": [
+      [
+        "Index",
+        "Reference"
+      ],
+      [
+        "1",
+        "Pop_Hous_Census_Volume 3M_Water and Sanitation_240222a.pdf"
+      ],
+      [
+        "2",
+        "0993402f3e475dae0fbfb5f51a762723.pdf"
+      ]
+    ]
+  },
+  "Toilet Facility and Sanitation Service Levels by Region.xlsx": {
+    "Table 1": [
+      [
+        "Region",
+        "Total_Households",
+        "No_toilet_facility_Open_Defecation",
+        "Septic_tank",
+        "KVIP_VIP",
+        "Pit_latrine",
+        "Bio_digester",
+        "Sewer",
+        "Public_toilet",
+        "Basic_service_exclusive_use",
+        "Limited_service_shared",
+        "Unimproved_facility"
+      ],
+      [
+        "Greater Accra",
+        "1,698,374;  $557,549.00$  (Demand  $m^3/day$ )",
+        "105,717; 8.1%",
+        "715,019",
+        "197,569",
+        "125,713",
+        "74,758",
+        "46,358",
+        "416,158",
+        "607,831; 63%",
+        "557,265",
+        "11,403"
+      ],
+      [
+        "Ashanti",
+        "1,521,844;  $162,829.00$  (Demand  $m^3/day$ )",
+        "111,306; 3.4%",
+        "500,565",
+        "203,454",
+        "231,943",
+        "8,506",
+        "4,524",
+        "448,940",
+        "400,171; 76%",
+        "548,972",
+        "12,455"
+      ]
+    ],
+    "Source References": [
+      [
+        "Index",
+        "Reference"
+      ],
+      [
+        "1",
+        "Pop_Hous_Census_Volume 3M_Water and Sanitation_240222a.pdf"
+      ],
+      [
+        "2",
+        "0993402f3e475dae0fbfb5f51a762723.pdf"
+      ]
+    ]
+  },
+  "Water Quality Testing Results for Kumasi and Tamale.xlsx": {
+    "Table 1": [
+      [
+        "City",
+        "Test_Parameter",
+        "Source_Type",
+        "Sample_Size",
+        "Value_or_Percentage",
+        "Notes"
+      ],
+      [
+        "Kumasi",
+        "E. coli - 0 CFU/100mL",
+        "On-premises connection",
+        "89",
+        "25%",
+        "Point of use measurements"
+      ],
+      [
+        "Kumasi",
+        "E. coli - 1-10 CFU/100mL",
+        "On-premises connection",
+        "89",
+        "31%",
+        "Point of use measurements"
+      ]
+    ],
+    "Source References": [
+      [
+        "Index",
+        "Reference"
+      ],
+      [
+        "1",
+        "Report-Component-1-Water-Quality-URBAN-WASH.pdf"
+      ],
+      [
+        "2",
+        "0993402f3e475dae0fbfb5f51a762723.pdf"
+      ]
+    ]
+  }
+}
