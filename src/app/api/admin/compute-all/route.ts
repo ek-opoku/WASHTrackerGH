@@ -2,8 +2,25 @@ import { NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
 import { calculateWASHIndex, RawWashParameters, WaterSourceType, SanitationFacilityType, HygieneFacilityType } from '@/lib/engine';
 import { aggregateIndexScores } from '@/lib/aggregation';
-import fs from 'fs';
-import path from 'path';
+
+// Load GeoJSON at runtime. On Vercel, public/ isn't on the serverless
+// filesystem, so we fetch from the app's own public URL first, then
+// fall back to fs for local development.
+async function loadGeoJSON(filename: string, baseUrl?: string) {
+    // Try fetch first (works on Vercel and locally when dev server is running)
+    if (baseUrl) {
+        try {
+            const res = await fetch(`${baseUrl}/data/${filename}`);
+            if (res.ok) return await res.json();
+        } catch { /* fall through to fs */ }
+    }
+
+    // Fallback: read from filesystem (local dev / environments with public/ on disk)
+    const fs = (await import('fs')).default;
+    const path = (await import('path')).default;
+    const filePath = path.join(process.cwd(), 'public/data', filename);
+    return JSON.parse(fs.readFileSync(filePath, 'utf8'));
+}
 
 function mapWaterSource(val: string | null): WaterSourceType | null {
     if (!val) return null;
@@ -50,8 +67,14 @@ function parseBoolean(val: any): boolean | null {
     return null;
 }
 
-export async function POST() {
+export async function POST(request: Request) {
     try {
+        // Derive the app's base URL for fetching public assets
+        const vercelUrl = process.env.VERCEL_URL;
+        const baseUrl = vercelUrl
+            ? `https://${vercelUrl}`
+            : new URL(request.url).origin;
+
         await prisma.computedIndex.deleteMany({});
         const rawData = await prisma.rawDomesticData.findMany();
         const rawMap = new Map();
@@ -59,8 +82,8 @@ export async function POST() {
             rawMap.set(r.spatial_id, r);
         }
 
-        const regionsRaw = JSON.parse(fs.readFileSync(path.join(process.cwd(), 'public/data/gha_regions.geojson'), 'utf8'));
-        const districtsRaw = JSON.parse(fs.readFileSync(path.join(process.cwd(), 'public/data/gha_districts.geojson'), 'utf8'));
+        const regionsRaw = await loadGeoJSON('gha_regions.geojson', baseUrl);
+        const districtsRaw = await loadGeoJSON('gha_districts.geojson', baseUrl);
 
         const regionProps = regionsRaw.features.map((f: any) => f.attributes || f.properties);
         const districtProps = districtsRaw.features.map((f: any) => f.attributes || f.properties);
