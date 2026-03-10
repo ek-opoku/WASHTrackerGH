@@ -19,7 +19,6 @@ model RawDomesticData {
   age_hh_head                 Int?
   disability_present          Boolean?
   migratory_status            String?
-
   water_source_type           String?
   water_secondary_source_type String?
   water_on_premises           Boolean?
@@ -31,17 +30,14 @@ model RawDomesticData {
   water_mercury_mg            Float?
   water_other_heavy_metals_mg Float?
   water_ph                    Float?
-
   san_facility_type           String?
   san_shared                  String?
   fsm_contained_safely        Boolean?
   fsm_emptied_safely          Boolean?
   fsm_treated_at_plant        Boolean?
-
   hyg_facility_type           String?
   hyg_water_present           String?
   hyg_soap_present            String?
-
   mhm_privacy                 String?
   mhm_materials               String?
   mhm_participation_exclusion String?
@@ -56,18 +52,14 @@ model ComputedIndex {
   name            String
   parentId        String?
   population      Int      @default(0)
-
   waterScore      Float
   sanitationScore Float
   hygieneScore    Float
   compositeScore  Float
   isCapped        Boolean  @default(false)
-
-  // JSON fields to store the aggregated ladder metrics for the UI
   waterData       Json?
   sanitationData  Json?
   hygieneData     Json?
-
   updatedAt       DateTime @updatedAt
 
   @@map("computed_index")

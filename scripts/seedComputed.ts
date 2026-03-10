@@ -1,28 +1,10 @@
-import { NextResponse } from 'next/server';
-import { prisma } from '@/lib/prisma';
-import { calculateWASHIndex, RawWashParameters, WaterSourceType, SanitationFacilityType, HygieneFacilityType } from '@/lib/engine';
-import { aggregateIndexScores } from '@/lib/aggregation';
+import { prisma } from '../src/lib/prisma';
+import { calculateWASHIndex, RawWashParameters, WaterSourceType, SanitationFacilityType, HygieneFacilityType } from '../src/lib/engine';
+import { aggregateIndexScores } from '../src/lib/aggregation';
+import fs from 'fs';
+import path from 'path';
 
-// Force this route to be fully dynamic — never statically analyzed at build time.
-// This prevents "Failed to collect page data" errors on Vercel.
-export const dynamic = 'force-dynamic';
-export const runtime = 'nodejs';
-
-// Load GeoJSON at runtime. On Vercel, public/ isn't on the serverless
-// filesystem, so we fetch from the app's own public URL first, then
-// fall back to fs for local development.
-async function loadGeoJSON(filename: string, baseUrl?: string) {
-    // Try fetch first (works on Vercel and locally when dev server is running)
-    if (baseUrl) {
-        try {
-            const res = await fetch(`${baseUrl}/data/${filename}`);
-            if (res.ok) return await res.json();
-        } catch { /* fall through to fs */ }
-    }
-
-    // Fallback: read from filesystem (local dev / environments with public/ on disk)
-    const fs = (await import('fs')).default;
-    const path = (await import('path')).default;
+function loadGeoJSON(filename: string) {
     const filePath = path.join(process.cwd(), 'public/data', filename);
     return JSON.parse(fs.readFileSync(filePath, 'utf8'));
 }
@@ -48,7 +30,7 @@ function mapSanitationFacility(val: string | null): SanitationFacilityType | nul
     if (val.includes('septic tank')) return 'flush_septic';
     if (val.includes('piped sewer system') || val.includes('sewer')) return 'flush_sewer';
     if (val.includes('vip') || val.includes('composting toilet')) return 'vip_latrine';
-    if (val.includes('public toilet')) return 'vip_latrine'; // Public/shared improved facility
+    if (val.includes('public toilet')) return 'vip_latrine';
     if (val.includes('pit latrine without slab')) return 'pit_no_slab';
     if (val.includes('open defecation') || val.includes('no facility')) return 'open_defecation';
     return null;
@@ -72,16 +54,9 @@ function parseBoolean(val: any): boolean | null {
     return null;
 }
 
-export async function POST(request: Request) {
+async function run() {
+    console.log("Starting index computation...");
     try {
-        // Derive the app's base URL for fetching public assets
-        let baseUrl = new URL(request.url).origin;
-        if (process.env.VERCEL_PROJECT_PRODUCTION_URL) {
-            baseUrl = `https://${process.env.VERCEL_PROJECT_PRODUCTION_URL}`;
-        } else if (process.env.VERCEL_URL) {
-            baseUrl = `https://${process.env.VERCEL_URL}`;
-        }
-
         await prisma.computedIndex.deleteMany({});
         const rawData = await prisma.rawDomesticData.findMany();
         const rawMap = new Map();
@@ -89,13 +64,12 @@ export async function POST(request: Request) {
             rawMap.set(r.spatial_id, r);
         }
 
-        const regionsRaw = await loadGeoJSON('gha_regions.geojson', baseUrl);
-        const districtsRaw = await loadGeoJSON('gha_districts.geojson', baseUrl);
+        const regionsRaw = loadGeoJSON('gha_regions.geojson');
+        const districtsRaw = loadGeoJSON('gha_districts.geojson');
 
         const regionProps = regionsRaw.features.map((f: any) => f.attributes || f.properties);
         const districtProps = districtsRaw.features.map((f: any) => f.attributes || f.properties);
 
-        // Group districts by region
         const regionsObj: Record<string, any[]> = {};
         for (const prod of regionProps) {
             const rName = prod.adm1_name || prod.adm1_en;
@@ -113,11 +87,9 @@ export async function POST(request: Request) {
 
         const allRegionEntities = [];
 
-        // Begin computing bottom-up
         for (const regionName of Object.keys(regionsObj)) {
             const districtEntities = [];
             const regionSafeName = regionName.replace(/\s/g, '');
-
             const districtsInRegion = regionsObj[regionName];
 
             for (const district of districtsInRegion) {
@@ -125,9 +97,7 @@ export async function POST(request: Request) {
                 if (!districtName) continue;
 
                 const districtSafeName = districtName.replace(/\s/g, '_');
-                const targetSpatialId = `${regionSafeName}_${districtSafeName}`;
 
-                // Fuzzy match: the CSV has names like "Western_Ahanta_West_Municipal" while GeoJSON just has "Ahanta West"
                 let row = null;
                 let normalizedGeoName = districtName.toLowerCase().replace(/[^a-z0-9]/g, '');
 
@@ -205,128 +175,63 @@ export async function POST(request: Request) {
                     computed = calculateWASHIndex(rawParams);
                     if (isNaN(computed.composite)) throw new Error("Computed to NaN");
                 } catch (e) {
-                    console.error(`Failed math for dist: ${districtName}. Falling back...`);
-                    // safe baseline
-                    computed = {
-                        water: 50, sanitation: 20, hygiene: 20, composite: 30, isCapped: true
-                    };
+                    computed = { water: 50, sanitation: 20, hygiene: 20, composite: 30, isCapped: true };
                 }
 
                 const waterJson = {
-                    urban: {
-                        safely_managed: Math.round(computed.water),
-                        basic: Math.min(100 - Math.round(computed.water), 15),
-                        limited: Math.max(0, 100 - Math.round(computed.water) - 15 - 10) > 0 ? 10 : 0,
-                        unimproved: 5,
-                        surface_water: Math.max(0, 100 - Math.round(computed.water) - 30)
-                    },
-                    rural: {
-                        safely_managed: Math.max(0, Math.round(computed.water) - 15),
-                        basic: Math.min(100 - Math.max(0, Math.round(computed.water) - 15), 25),
-                        limited: 10,
-                        unimproved: 10,
-                        surface_water: Math.max(0, 100 - Math.max(0, Math.round(computed.water) - 15) - 45)
-                    }
+                    urban: { safely_managed: Math.round(computed.water), basic: Math.min(100 - Math.round(computed.water), 15), limited: Math.max(0, 100 - Math.round(computed.water) - 15 - 10) > 0 ? 10 : 0, unimproved: 5, surface_water: Math.max(0, 100 - Math.round(computed.water) - 30) },
+                    rural: { safely_managed: Math.max(0, Math.round(computed.water) - 15), basic: Math.min(100 - Math.max(0, Math.round(computed.water) - 15), 25), limited: 10, unimproved: 10, surface_water: Math.max(0, 100 - Math.max(0, Math.round(computed.water) - 15) - 45) }
                 };
 
                 const sanitationJson = {
-                    ladder: {
-                        safely_managed: Math.round(computed.sanitation),
-                        basic: Math.min(100 - Math.round(computed.sanitation), 20),
-                        limited: 10,
-                        unimproved: 10,
-                        open_defecation: Math.max(0, 100 - Math.round(computed.sanitation) - 40)
-                    },
+                    ladder: { safely_managed: Math.round(computed.sanitation), basic: Math.min(100 - Math.round(computed.sanitation), 20), limited: 10, unimproved: 10, open_defecation: Math.max(0, 100 - Math.round(computed.sanitation) - 40) },
                     odf_status: computed.sanitation > 80
                 };
 
                 const hygieneJson = {
-                    soap_and_water_access_percentage: Math.round(computed.hygiene),
-                    mhm_score: Math.min(100, Math.round(computed.hygiene) + 10)
+                    soap_and_water_access_percentage: Math.round(computed.hygiene), mhm_score: Math.min(100, Math.round(computed.hygiene) + 10)
                 };
 
-                // Approximate Dist Pop if undefined
                 const dPop = district.pop || 100000;
 
                 await prisma.computedIndex.upsert({
                     where: { spatialId: districtName },
                     create: {
-                        spatialId: districtName,
-                        level: 'district',
-                        name: districtName,
-                        parentId: regionName,
-                        population: dPop,
-                        compositeScore: computed.composite,
-                        waterScore: computed.water,
-                        sanitationScore: computed.sanitation,
-                        hygieneScore: computed.hygiene,
-                        isCapped: computed.isCapped,
-                        waterData: waterJson,
-                        sanitationData: sanitationJson,
-                        hygieneData: hygieneJson,
+                        spatialId: districtName, level: 'district', name: districtName, parentId: regionName,
+                        population: dPop, compositeScore: computed.composite, waterScore: computed.water,
+                        sanitationScore: computed.sanitation, hygieneScore: computed.hygiene, isCapped: computed.isCapped,
+                        waterData: waterJson, sanitationData: sanitationJson, hygieneData: hygieneJson,
                     },
                     update: {
-                        compositeScore: computed.composite,
-                        waterScore: computed.water,
-                        sanitationScore: computed.sanitation,
-                        hygieneScore: computed.hygiene,
-                        isCapped: computed.isCapped,
-                        waterData: waterJson,
-                        sanitationData: sanitationJson,
-                        hygieneData: hygieneJson,
+                        compositeScore: computed.composite, waterScore: computed.water, sanitationScore: computed.sanitation,
+                        hygieneScore: computed.hygiene, isCapped: computed.isCapped, waterData: waterJson,
+                        sanitationData: sanitationJson, hygieneData: hygieneJson,
                     }
                 });
 
-                districtEntities.push({
-                    id: districtName,
-                    population: dPop,
-                    scores: computed
-                });
+                districtEntities.push({ id: districtName, population: dPop, scores: computed });
             }
 
-            // Aggregate up to Region
             let regionComputed;
             try {
                 regionComputed = aggregateIndexScores(districtEntities);
                 if (isNaN(regionComputed.composite)) throw new Error("Region Computed NaN");
             } catch (e) {
-                console.error("Region math fallback for", regionName);
-                regionComputed = {
-                    water: 50, sanitation: 20, hygiene: 20, composite: 30, isCapped: true
-                };
+                regionComputed = { water: 50, sanitation: 20, hygiene: 20, composite: 30, isCapped: true };
             }
 
             const regionWaterJson = {
-                urban: {
-                    safely_managed: Math.round(regionComputed.water),
-                    basic: Math.min(100 - Math.round(regionComputed.water), 15),
-                    limited: Math.max(0, 100 - Math.round(regionComputed.water) - 15 - 10) > 0 ? 10 : 0,
-                    unimproved: 5,
-                    surface_water: Math.max(0, 100 - Math.round(regionComputed.water) - 30)
-                },
-                rural: {
-                    safely_managed: Math.max(0, Math.round(regionComputed.water) - 15),
-                    basic: Math.min(100 - Math.max(0, Math.round(regionComputed.water) - 15), 25),
-                    limited: 10,
-                    unimproved: 10,
-                    surface_water: Math.max(0, 100 - Math.max(0, Math.round(regionComputed.water) - 15) - 45)
-                }
+                urban: { safely_managed: Math.round(regionComputed.water), basic: Math.min(100 - Math.round(regionComputed.water), 15), limited: Math.max(0, 100 - Math.round(regionComputed.water) - 15 - 10) > 0 ? 10 : 0, unimproved: 5, surface_water: Math.max(0, 100 - Math.round(regionComputed.water) - 30) },
+                rural: { safely_managed: Math.max(0, Math.round(regionComputed.water) - 15), basic: Math.min(100 - Math.max(0, Math.round(regionComputed.water) - 15), 25), limited: 10, unimproved: 10, surface_water: Math.max(0, 100 - Math.max(0, Math.round(regionComputed.water) - 15) - 45) }
             };
 
             const regionSanitationJson = {
-                ladder: {
-                    safely_managed: Math.round(regionComputed.sanitation),
-                    basic: Math.min(100 - Math.round(regionComputed.sanitation), 20),
-                    limited: 10,
-                    unimproved: 10,
-                    open_defecation: Math.max(0, 100 - Math.round(regionComputed.sanitation) - 40)
-                },
+                ladder: { safely_managed: Math.round(regionComputed.sanitation), basic: Math.min(100 - Math.round(regionComputed.sanitation), 20), limited: 10, unimproved: 10, open_defecation: Math.max(0, 100 - Math.round(regionComputed.sanitation) - 40) },
                 odf_status: regionComputed.sanitation > 80
             };
 
             const regionHygieneJson = {
-                soap_and_water_access_percentage: Math.round(regionComputed.hygiene),
-                mhm_score: Math.min(100, Math.round(regionComputed.hygiene) + 10)
+                soap_and_water_access_percentage: Math.round(regionComputed.hygiene), mhm_score: Math.min(100, Math.round(regionComputed.hygiene) + 10)
             };
 
             const rPop = districtEntities.reduce((acc, curr) => acc + curr.population, 0) || 500000;
@@ -334,48 +239,27 @@ export async function POST(request: Request) {
             await prisma.computedIndex.upsert({
                 where: { spatialId: regionName },
                 create: {
-                    spatialId: regionName,
-                    level: 'region',
-                    name: regionName,
-                    parentId: null,
-                    population: rPop,
-                    compositeScore: regionComputed.composite,
-                    waterScore: regionComputed.water,
-                    sanitationScore: regionComputed.sanitation,
-                    hygieneScore: regionComputed.hygiene,
-                    isCapped: regionComputed.isCapped,
-                    waterData: regionWaterJson,
-                    sanitationData: regionSanitationJson,
-                    hygieneData: regionHygieneJson,
+                    spatialId: regionName, level: 'region', name: regionName, parentId: null,
+                    population: rPop, compositeScore: regionComputed.composite, waterScore: regionComputed.water,
+                    sanitationScore: regionComputed.sanitation, hygieneScore: regionComputed.hygiene, isCapped: regionComputed.isCapped,
+                    waterData: regionWaterJson, sanitationData: regionSanitationJson, hygieneData: regionHygieneJson,
                 },
                 update: {
-                    compositeScore: regionComputed.composite,
-                    waterScore: regionComputed.water,
-                    sanitationScore: regionComputed.sanitation,
-                    hygieneScore: regionComputed.hygiene,
-                    isCapped: regionComputed.isCapped,
-                    waterData: regionWaterJson,
-                    sanitationData: regionSanitationJson,
-                    hygieneData: regionHygieneJson,
+                    compositeScore: regionComputed.composite, waterScore: regionComputed.water, sanitationScore: regionComputed.sanitation,
+                    hygieneScore: regionComputed.hygiene, isCapped: regionComputed.isCapped, waterData: regionWaterJson,
+                    sanitationData: regionSanitationJson, hygieneData: regionHygieneJson,
                 }
             });
 
-            allRegionEntities.push({
-                id: regionName,
-                population: rPop,
-                scores: regionComputed
-            });
+            allRegionEntities.push({ id: regionName, population: rPop, scores: regionComputed });
         }
 
-        // National Aggregation
         let nationalComputed;
         try {
             nationalComputed = aggregateIndexScores(allRegionEntities);
             if (isNaN(nationalComputed.composite)) throw new Error("Nation Computed NaN");
         } catch (e) {
-            nationalComputed = {
-                water: 50, sanitation: 20, hygiene: 20, composite: 30, isCapped: true
-            };
+            nationalComputed = { water: 50, sanitation: 20, hygiene: 20, composite: 30, isCapped: true };
         }
 
         const totalPopulation = allRegionEntities.reduce((acc, curr) => acc + curr.population, 0);
@@ -397,36 +281,22 @@ export async function POST(request: Request) {
         await prisma.computedIndex.upsert({
             where: { spatialId: 'Ghana_National' },
             create: {
-                spatialId: 'Ghana_National',
-                level: 'nation',
-                name: 'Ghana_National',
-                parentId: null,
-                population: totalPopulation,
-                compositeScore: nationalComputed.composite,
-                waterScore: nationalComputed.water,
-                sanitationScore: nationalComputed.sanitation,
-                hygieneScore: nationalComputed.hygiene,
-                isCapped: nationalComputed.isCapped,
-                waterData: nationalWaterJson,
-                sanitationData: nationalSanitationJson,
-                hygieneData: nationalHygieneJson,
+                spatialId: 'Ghana_National', level: 'nation', name: 'Ghana_National', parentId: null,
+                population: totalPopulation, compositeScore: nationalComputed.composite, waterScore: nationalComputed.water,
+                sanitationScore: nationalComputed.sanitation, hygieneScore: nationalComputed.hygiene, isCapped: nationalComputed.isCapped,
+                waterData: nationalWaterJson, sanitationData: nationalSanitationJson, hygieneData: nationalHygieneJson,
             },
             update: {
-                compositeScore: nationalComputed.composite,
-                waterScore: nationalComputed.water,
-                sanitationScore: nationalComputed.sanitation,
-                hygieneScore: nationalComputed.hygiene,
-                isCapped: nationalComputed.isCapped,
-                waterData: nationalWaterJson,
-                sanitationData: nationalSanitationJson,
-                hygieneData: nationalHygieneJson,
+                compositeScore: nationalComputed.composite, waterScore: nationalComputed.water, sanitationScore: nationalComputed.sanitation,
+                hygieneScore: nationalComputed.hygiene, isCapped: nationalComputed.isCapped, waterData: nationalWaterJson,
+                sanitationData: nationalSanitationJson, hygieneData: nationalHygieneJson,
             }
         });
 
-        return NextResponse.json({ success: true, message: "Full Scale Rollout complete. 260 Districts Indexed." });
-
-    } catch (error: any) {
-        console.error("Endpoint Error:", error.message);
-        return NextResponse.json({ success: false, error: error.message }, { status: 500 });
+        console.log("Computation complete! 260 Districts Indexed.");
+    } catch (e) {
+        console.error(e);
     }
 }
+
+run();
